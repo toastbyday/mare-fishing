@@ -72,7 +72,7 @@ function showAccountChooser(message=""){
   G.choosingAccount=true;
   G.running=false;
   clearInterval(G.presenceTimer);clearInterval(G.worldTimer);cleanupRealtime();
-  if(G.session?.user?.id) sb.from("mare_presence").delete().eq("user_id",G.session.user.id).catch(()=>{});
+  if(G.session?.user?.id) sb.from("mare_presence").delete().eq("user_id",G.session.user.id).then(()=>{},()=>{});
   ui.app.classList.add("hidden");
   ui.loading.classList.add("hidden");
   ui.auth.classList.remove("hidden");
