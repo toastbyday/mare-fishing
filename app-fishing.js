@@ -25,37 +25,107 @@ function endFishing(){G.fishing.busy=false;G.fishing.charging=false;G.fishing.ch
 function showCatch(c){ui.catchRarity.textContent=c.rarity.toUpperCase();ui.catchRarity.className=rarityClass(c.rarity);ui.catchName.textContent=c.name;ui.catchTraits.innerHTML=[...(c.attributes||[]),c.mutation].filter(Boolean).map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join("")||`<span class="tag">Captura normal</span>`;ui.catchWeight.textContent=Number(c.weight).toFixed(2)+" kg";ui.catchValue.textContent="C$ "+fmt.format(c.value);ui.catchXp.textContent="+"+fmt.format(c.xp);ui.catchModal.classList.remove("hidden");}
 $("#catchClose").onclick=()=>ui.catchModal.classList.add("hidden");
 
+const ACCOUNT_PREFIX="mare-account-v1:";
+function normalizeUsername(value){
+  return String(value||"").trim().toLocaleLowerCase("pt-BR");
+}
+function accountStorageKey(username){
+  return ACCOUNT_PREFIX+encodeURIComponent(normalizeUsername(username));
+}
+function rememberAccount(username,session){
+  if(!username||!session?.access_token||!session?.refresh_token)return;
+  localStorage.setItem(accountStorageKey(username),JSON.stringify({
+    username:String(username),
+    access_token:session.access_token,
+    refresh_token:session.refresh_token,
+    saved_at:Date.now()
+  }));
+}
+function loadRememberedAccount(username){
+  try{
+    const raw=localStorage.getItem(accountStorageKey(username));
+    if(!raw)return null;
+    const data=JSON.parse(raw);
+    if(!data?.access_token||!data?.refresh_token)return null;
+    return data;
+  }catch{return null;}
+}
+function moveRememberedAccount(oldName,newName,session){
+  const oldKey=oldName?accountStorageKey(oldName):null;
+  if(oldKey)localStorage.removeItem(oldKey);
+  rememberAccount(newName,session);
+}
+function usernameError(value){
+  const name=String(value||"").trim();
+  if(name.length<3)return "O nome precisa ter pelo menos 3 caracteres.";
+  if(name.length>24)return "O nome pode ter no máximo 24 caracteres.";
+  return "";
+}
 function authErrorMessage(error){
   const raw=String(error?.message||"");
   const msg=raw.toLowerCase();
-  if(msg.includes("email not confirmed")) return "Seu e-mail ainda não foi confirmado. Abra o e-mail de confirmação e tente novamente.";
-  if(msg.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
-  if(msg.includes("user already registered")) return "Já existe uma conta com esse e-mail.";
-  return raw || "Não foi possível autenticar.";
+  if(msg.includes("anonymous sign-ins are disabled")||msg.includes("anonymous provider is disabled")) return "O modo de conta sem e-mail ainda não está ativado no Supabase.";
+  if(msg.includes("invalid refresh token")||msg.includes("refresh token not found")) return "Essa conta não está mais disponível neste navegador.";
+  return raw || "Não foi possível entrar.";
 }
-$$('[data-auth-tab]').forEach(btn=>btn.onclick=()=>{$$('[data-auth-tab]').forEach(b=>b.classList.toggle("active",b===btn));$("#loginForm").classList.toggle("hidden",btn.dataset.authTab!=="login");$("#signupForm").classList.toggle("hidden",btn.dataset.authTab!=="signup");authMsg("");});
+function showAccountChooser(message=""){
+  G.choosingAccount=true;
+  G.running=false;
+  clearInterval(G.presenceTimer);clearInterval(G.worldTimer);cleanupRealtime();
+  if(G.session?.user?.id) sb.from("mare_presence").delete().eq("user_id",G.session.user.id).catch(()=>{});
+  ui.app.classList.add("hidden");
+  ui.loading.classList.add("hidden");
+  ui.auth.classList.remove("hidden");
+  closePanel();
+  authMsg(message,false);
+}
+$$('[data-auth-tab]').forEach(btn=>btn.onclick=()=>{
+  $$('[data-auth-tab]').forEach(b=>b.classList.toggle("active",b===btn));
+  $("#loginForm").classList.toggle("hidden",btn.dataset.authTab!=="login");
+  $("#signupForm").classList.toggle("hidden",btn.dataset.authTab!=="signup");
+  authMsg("");
+});
 $("#loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
+  const username=$("#loginUsername").value.trim();
+  const bad=usernameError(username);if(bad)return authMsg(bad);
+  const saved=loadRememberedAccount(username);
+  if(!saved)return authMsg("Essa conta não está salva neste navegador. Se for nova, use “Criar conta”.");
   authMsg("Entrando...");
-  const email=$("#loginEmail").value.trim(),password=$("#loginPassword").value;
-  const {data,error}=await sb.auth.signInWithPassword({email,password});
-  if(error) return authMsg(authErrorMessage(error));
-  if(data?.session){
-    authMsg("Login concluído. Carregando jogo...",true);
+  G.authManual=true;
+  try{
+    const {data,error}=await sb.auth.setSession({access_token:saved.access_token,refresh_token:saved.refresh_token});
+    if(error)throw error;
+    if(!data?.session)throw new Error("Sessão inválida.");
+    G.choosingAccount=false;
     await boot(data.session);
-  }
+    if(normalizeUsername(G.profile?.username)!==normalizeUsername(username)){
+      throw new Error("O nome salvo não corresponde a esta conta.");
+    }
+    rememberAccount(G.profile.username,data.session);
+  }catch(error){
+    authMsg(authErrorMessage(error));
+  }finally{G.authManual=false;}
 });
 $("#signupForm").addEventListener("submit",async e=>{
   e.preventDefault();
+  const username=$("#signupName").value.trim();
+  const bad=usernameError(username);if(bad)return authMsg(bad);
+  if(loadRememberedAccount(username))return authMsg("Essa conta já está salva neste navegador. Use “Entrar”.");
   authMsg("Criando conta...");
-  const username=$("#signupName").value.trim(),email=$("#signupEmail").value.trim(),password=$("#signupPassword").value;
-  const {data,error}=await sb.auth.signUp({email,password,options:{data:{username}}});
-  if(error) return authMsg(authErrorMessage(error));
-  if(!data.session) authMsg("Conta criada. Confirme seu e-mail e depois entre.",true);
-  else {
-    authMsg("Conta criada! Carregando jogo...",true);
+  G.authManual=true;
+  try{
+    const {data,error}=await sb.auth.signInAnonymously();
+    if(error)throw error;
+    if(!data?.session)throw new Error("Não foi possível criar a sessão.");
+    const named=await game("set_name",{username});
+    G.profile=named.profile;
+    rememberAccount(username,data.session);
+    G.choosingAccount=false;
     await boot(data.session);
-  }
+  }catch(error){
+    authMsg(authErrorMessage(error));
+  }finally{G.authManual=false;}
 });
 
 function showGameScreen(){
@@ -69,7 +139,7 @@ async function boot(session) {
   if (G.booting) return;
   G.booting=true;G.session=session;ui.loading.classList.remove("hidden");ui.auth.classList.add("hidden");
   try {
-    await fetchCatalogs();await refreshState();restorePosition();await loadPresence();subscribeRealtime();await upsertPresence();
+    await fetchCatalogs();await refreshState();rememberAccount(G.profile.username,session);restorePosition();await loadPresence();subscribeRealtime();await upsertPresence();
     clearInterval(G.presenceTimer);G.presenceTimer=setInterval(()=>{upsertPresence();savePosition();loadPresence();},15000);
     clearInterval(G.worldTimer);G.worldTimer=setInterval(()=>refreshState().catch(()=>{}),120000);
     G.running=true;G.last=performance.now();showGameScreen();requestAnimationFrame(loop);syncHud();authMsg("");
@@ -80,13 +150,15 @@ async function shutdown(){G.running=false;G.booting=false;clearInterval(G.presen
 
 sb.auth.onAuthStateChange((event,session)=>{
   setTimeout(()=>{
-    if((event==="SIGNED_IN" || event==="INITIAL_SESSION") && session) {
+    if(G.authManual)return;
+    if((event==="SIGNED_IN" || event==="INITIAL_SESSION") && session && !G.choosingAccount) {
       boot(session).catch(err=>{console.error(err);authMsg("Falha ao carregar o jogo: "+err.message);});
     } else if(event==="SIGNED_OUT") {
       shutdown().catch(console.error);
-    } else if(event==="TOKEN_REFRESHED" && session && !G.running && !G.booting) {
-      boot(session).catch(console.error);
+    } else if(event==="TOKEN_REFRESHED" && session) {
+      if(G.profile?.username)rememberAccount(G.profile.username,session);
+      if(!G.running && !G.booting && !G.choosingAccount)boot(session).catch(console.error);
     }
   },0);
 });
-(async()=>{const {data:{session}}=await sb.auth.getSession();if(session)await boot(session);else{ui.auth.classList.remove("hidden");ui.loading.classList.add("hidden");}})();
+(async()=>{const {data:{session}}=await sb.auth.getSession();if(session)await boot(session);else{G.choosingAccount=true;ui.auth.classList.remove("hidden");ui.loading.classList.add("hidden");}})();
