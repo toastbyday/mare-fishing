@@ -1,7 +1,7 @@
 function panelButton(panel){return `<button data-panel-tab="${panel}">${panel}</button>`;}
 function openPanel(type) { if(G.fishing.busy)return;G.panel=type;ui.sidePanel.classList.remove("hidden");renderPanel(type); }
 function closePanel(){G.panel=null;ui.sidePanel.classList.add("hidden");}
-$("#closePanel").onclick=closePanel;$("#menuBtn").onclick=()=>openPanel("profile");$$('[data-panel]').forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));
+$("#closePanel").onclick=closePanel;$("#menuBtn").onclick=()=>openPanel("profile");$$$('[data-panel]').forEach(b=>b.onclick=()=>openPanel(b.dataset.panel));
 
 function setTabs(tabs,active,fn){ui.panelTabs.innerHTML=tabs.map(t=>`<button class="${t.id===active?"active":""}" data-tab="${t.id}">${t.label}</button>`).join("");ui.panelTabs.querySelectorAll("button").forEach(b=>b.onclick=()=>fn(b.dataset.tab));}
 
