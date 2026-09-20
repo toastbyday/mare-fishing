@@ -33,7 +33,7 @@ function authErrorMessage(error){
   if(msg.includes("user already registered")) return "Já existe uma conta com esse e-mail.";
   return raw || "Não foi possível autenticar.";
 }
-$('[data-auth-tab]').forEach(btn=>btn.onclick=()=>{$('[data-auth-tab]').forEach(b=>b.classList.toggle("active",b===btn));$("#loginForm").classList.toggle("hidden",btn.dataset.authTab!=="login");$("#signupForm").classList.toggle("hidden",btn.dataset.authTab!=="signup");authMsg("");});
+$$('[data-auth-tab]').forEach(btn=>btn.onclick=()=>{$$('[data-auth-tab]').forEach(b=>b.classList.toggle("active",b===btn));$("#loginForm").classList.toggle("hidden",btn.dataset.authTab!=="login");$("#signupForm").classList.toggle("hidden",btn.dataset.authTab!=="signup");authMsg("");});
 $("#loginForm").addEventListener("submit",async e=>{
   e.preventDefault();
   authMsg("Entrando...");
