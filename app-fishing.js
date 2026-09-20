@@ -58,14 +58,21 @@ $("#signupForm").addEventListener("submit",async e=>{
   }
 });
 
+function showGameScreen(){
+  ui.auth.classList.add("hidden");
+  ui.loading.classList.add("hidden");
+  ui.app.classList.remove("hidden");
+}
 async function boot(session) {
-  if (G.booting || (G.running && G.session?.user?.id === session?.user?.id)) return;
+  if (!session?.user) throw new Error("Sessão inválida.");
+  if (G.running && G.session?.user?.id === session.user.id) { showGameScreen(); return; }
+  if (G.booting) return;
   G.booting=true;G.session=session;ui.loading.classList.remove("hidden");ui.auth.classList.add("hidden");
   try {
     await fetchCatalogs();await refreshState();restorePosition();await loadPresence();subscribeRealtime();await upsertPresence();
     clearInterval(G.presenceTimer);G.presenceTimer=setInterval(()=>{upsertPresence();savePosition();loadPresence();},15000);
     clearInterval(G.worldTimer);G.worldTimer=setInterval(()=>refreshState().catch(()=>{}),120000);
-    G.running=true;G.last=performance.now();ui.app.classList.remove("hidden");requestAnimationFrame(loop);syncHud();
+    G.running=true;G.last=performance.now();showGameScreen();requestAnimationFrame(loop);syncHud();authMsg("");
   } catch(e) {console.error(e);toast("Falha ao carregar: "+e.message,"error");ui.auth.classList.remove("hidden");}
   finally {G.booting=false;ui.loading.classList.add("hidden");}
 }
@@ -73,10 +80,12 @@ async function shutdown(){G.running=false;G.booting=false;clearInterval(G.presen
 
 sb.auth.onAuthStateChange((event,session)=>{
   setTimeout(()=>{
-    if(session && (!G.session || G.session.user.id!==session.user.id)) {
+    if((event==="SIGNED_IN" || event==="INITIAL_SESSION") && session) {
       boot(session).catch(err=>{console.error(err);authMsg("Falha ao carregar o jogo: "+err.message);});
-    } else if(!session && G.session) {
+    } else if(event==="SIGNED_OUT") {
       shutdown().catch(console.error);
+    } else if(event==="TOKEN_REFRESHED" && session && !G.running && !G.booting) {
+      boot(session).catch(console.error);
     }
   },0);
 });
