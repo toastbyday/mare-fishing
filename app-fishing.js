@@ -25,9 +25,38 @@ function endFishing(){G.fishing.busy=false;G.fishing.charging=false;G.fishing.ch
 function showCatch(c){ui.catchRarity.textContent=c.rarity.toUpperCase();ui.catchRarity.className=rarityClass(c.rarity);ui.catchName.textContent=c.name;ui.catchTraits.innerHTML=[...(c.attributes||[]),c.mutation].filter(Boolean).map(x=>`<span class="tag">${escapeHtml(x)}</span>`).join("")||`<span class="tag">Captura normal</span>`;ui.catchWeight.textContent=Number(c.weight).toFixed(2)+" kg";ui.catchValue.textContent="C$ "+fmt.format(c.value);ui.catchXp.textContent="+"+fmt.format(c.xp);ui.catchModal.classList.remove("hidden");}
 $("#catchClose").onclick=()=>ui.catchModal.classList.add("hidden");
 
-$$('[data-auth-tab]').forEach(btn=>btn.onclick=()=>{$$('[data-auth-tab]').forEach(b=>b.classList.toggle("active",b===btn));$("#loginForm").classList.toggle("hidden",btn.dataset.authTab!=="login");$("#signupForm").classList.toggle("hidden",btn.dataset.authTab!=="signup");authMsg("");});
-$("#loginForm").addEventListener("submit",async e=>{e.preventDefault();authMsg("Entrando...");const email=$("#loginEmail").value.trim(),password=$("#loginPassword").value;const {error}=await sb.auth.signInWithPassword({email,password});if(error)authMsg(error.message);});
-$("#signupForm").addEventListener("submit",async e=>{e.preventDefault();authMsg("Criando conta...");const username=$("#signupName").value.trim(),email=$("#signupEmail").value.trim(),password=$("#signupPassword").value;const {data,error}=await sb.auth.signUp({email,password,options:{data:{username}}});if(error)return authMsg(error.message);if(!data.session)authMsg("Conta criada. Confira seu e-mail para confirmar e depois entre.",true);else authMsg("Conta criada!",true);});
+function authErrorMessage(error){
+  const raw=String(error?.message||"");
+  const msg=raw.toLowerCase();
+  if(msg.includes("email not confirmed")) return "Seu e-mail ainda não foi confirmado. Abra o e-mail de confirmação e tente novamente.";
+  if(msg.includes("invalid login credentials")) return "E-mail ou senha incorretos.";
+  if(msg.includes("user already registered")) return "Já existe uma conta com esse e-mail.";
+  return raw || "Não foi possível autenticar.";
+}
+$('[data-auth-tab]').forEach(btn=>btn.onclick=()=>{$('[data-auth-tab]').forEach(b=>b.classList.toggle("active",b===btn));$("#loginForm").classList.toggle("hidden",btn.dataset.authTab!=="login");$("#signupForm").classList.toggle("hidden",btn.dataset.authTab!=="signup");authMsg("");});
+$("#loginForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  authMsg("Entrando...");
+  const email=$("#loginEmail").value.trim(),password=$("#loginPassword").value;
+  const {data,error}=await sb.auth.signInWithPassword({email,password});
+  if(error) return authMsg(authErrorMessage(error));
+  if(data?.session){
+    authMsg("Login concluído. Carregando jogo...",true);
+    await boot(data.session);
+  }
+});
+$("#signupForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  authMsg("Criando conta...");
+  const username=$("#signupName").value.trim(),email=$("#signupEmail").value.trim(),password=$("#signupPassword").value;
+  const {data,error}=await sb.auth.signUp({email,password,options:{data:{username}}});
+  if(error) return authMsg(authErrorMessage(error));
+  if(!data.session) authMsg("Conta criada. Confirme seu e-mail e depois entre.",true);
+  else {
+    authMsg("Conta criada! Carregando jogo...",true);
+    await boot(data.session);
+  }
+});
 
 async function boot(session) {
   if (G.booting || (G.running && G.session?.user?.id === session?.user?.id)) return;
@@ -42,8 +71,13 @@ async function boot(session) {
 }
 async function shutdown(){G.running=false;G.booting=false;clearInterval(G.presenceTimer);clearInterval(G.worldTimer);cleanupRealtime();if(G.session){try{await sb.from("mare_presence").delete().eq("user_id",G.session.user.id);}catch{}}G.session=null;G.profile=null;G.others.clear();ui.app.classList.add("hidden");ui.auth.classList.remove("hidden");closePanel();}
 
-sb.auth.onAuthStateChange(async (event,session)=>{
-  if(session && (!G.session || G.session.user.id!==session.user.id)) await boot(session);
-  if(!session && G.session) await shutdown();
+sb.auth.onAuthStateChange((event,session)=>{
+  setTimeout(()=>{
+    if(session && (!G.session || G.session.user.id!==session.user.id)) {
+      boot(session).catch(err=>{console.error(err);authMsg("Falha ao carregar o jogo: "+err.message);});
+    } else if(!session && G.session) {
+      shutdown().catch(console.error);
+    }
+  },0);
 });
 (async()=>{const {data:{session}}=await sb.auth.getSession();if(session)await boot(session);else{ui.auth.classList.remove("hidden");ui.loading.classList.add("hidden");}})();
