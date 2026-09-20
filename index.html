@@ -7,7 +7,7 @@
   <meta name="description" content="Mare Fishing — aventura online de pesca, exploração e coleção." />
   <title>Mare Fishing</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="./styles.css?v=20260920-auth6" />
+  <link rel="stylesheet" href="./styles.css?v=20260920-world1" />
 </head>
 <body>
   <div id="app" class="app hidden">
@@ -25,9 +25,19 @@
       <div class="panel-mini-title"><span class="online-dot"></span> ONLINE <b id="onlineCount">1</b></div>
       <div id="onlineList" class="online-list"></div>
     </aside>
+    <aside class="minimap-panel glass" id="minimapPanel">
+      <div class="minimap-title"><span>MAPA</span><small>tempo real</small></div>
+      <canvas id="minimap" width="180" height="132" aria-label="Minimapa"></canvas>
+      <div class="minimap-legend"><span><i class="you-dot"></i>Você</span><span><i class="player-dot"></i>Jogadores</span></div>
+    </aside>
     <div id="eventBanner" class="event-banner hidden"></div>
     <div id="announcement" class="announcement hidden"></div>
     <div id="waypoint" class="waypoint">HARBOR HAVEN <span>0m</span></div>
+    <button id="vendorPrompt" class="vendor-prompt glass hidden" type="button">
+      <span class="vendor-icon">⚓</span>
+      <span><b>Capitão Nilo</b><small>Comprar barcos</small></span>
+      <kbd>E</kbd>
+    </button>
     <div class="mobile-joystick" id="joystick"><div class="joystick-ring"><div id="joystickKnob" class="joystick-knob"></div></div></div>
     <div class="action-cluster"><button id="fishBtn" class="fish-btn"><span class="hook">⌁</span><b>PESCAR</b><small id="fishHint">segure e solte</small></button></div>
     <nav class="bottom-nav glass">
@@ -74,10 +84,10 @@
   </section>
   <div id="toastStack" class="toast-stack"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-  <script src="./app-core.js?v=20260920-auth6"></script>
-  <script src="./app-world.js?v=20260920-auth6"></script>
-  <script src="./app-ui.js?v=20260920-auth6"></script>
-  <script src="./app-ui-extra.js?v=20260920-auth6"></script>
-  <script src="./app-fishing.js?v=20260920-auth6"></script>
+  <script src="./app-core.js?v=20260920-world1"></script>
+  <script src="./app-world.js?v=20260920-world1"></script>
+  <script src="./app-ui.js?v=20260920-world1"></script>
+  <script src="./app-ui-extra.js?v=20260920-world1"></script>
+  <script src="./app-fishing.js?v=20260920-world1"></script>
 </body>
 </html>
