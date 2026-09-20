@@ -11,3 +11,27 @@
 .action-cluster{position:fixed;z-index:22;right:30px;bottom:105px}.fish-btn{width:104px;height:104px;border-radius:50%;border:1px solid rgba(166,235,255,.4);background:radial-gradient(circle at 35% 30%,#57dbff,#247ac3 58%,#13486e);box-shadow:0 10px 35px rgba(47,167,255,.4),inset 0 0 0 6px rgba(255,255,255,.06);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;touch-action:none}.fish-btn:active,.fish-btn.charging{transform:scale(.96);box-shadow:0 7px 24px rgba(47,167,255,.35),inset 0 0 30px rgba(255,255,255,.13)}.fish-btn .hook{font-size:28px;line-height:24px}.fish-btn b{font-size:12px;letter-spacing:.08em}.fish-btn small{font-size:8px;opacity:.7;margin-top:2px}
 .bottom-nav{position:fixed;z-index:20;left:50%;bottom:max(18px,env(safe-area-inset-bottom));transform:translateX(-50%);height:70px;border-radius:21px;padding:6px;display:flex;gap:4px}.bottom-nav button{width:86px;border:0;border-radius:16px;background:transparent;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#abc5d2}.bottom-nav button:hover{background:rgba(255,255,255,.06);color:#fff}.bottom-nav span{font-size:18px}.bottom-nav small{font-size:9px}
 .mobile-joystick{display:none;position:fixed;z-index:22;left:28px;bottom:112px;width:110px;height:110px}.joystick-ring{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(255,255,255,.18);background:rgba(2,17,27,.28);backdrop-filter:blur(8px)}.joystick-knob{position:absolute;width:46px;height:46px;border-radius:50%;left:32px;top:32px;background:rgba(163,231,255,.26);border:1px solid rgba(255,255,255,.3);box-shadow:0 5px 18px rgba(0,0,0,.2)}
+
+.minimap-panel{position:fixed;z-index:16;left:18px;top:104px;width:214px;padding:10px;border-radius:18px;overflow:hidden}
+.minimap-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;padding:0 2px}
+.minimap-title span{font-size:9px;font-weight:900;letter-spacing:.18em;color:#dff7ff}
+.minimap-title small{font-size:7px;color:var(--cyan);letter-spacing:.1em}
+#minimap{display:block;width:100%;height:132px;border-radius:12px;border:1px solid rgba(180,235,255,.14);background:#082536;box-shadow:inset 0 0 22px rgba(0,0,0,.26)}
+.minimap-legend{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:7px;font-size:7px;color:var(--muted)}
+.minimap-legend span{display:flex;align-items:center;gap:4px}
+.minimap-legend i{display:inline-block;width:6px;height:6px;border-radius:50%}.you-dot{background:#fff;box-shadow:0 0 0 1px #48d5ff}.player-dot{background:#78efbd}
+.vendor-prompt{position:fixed;z-index:32;left:50%;bottom:100px;transform:translateX(-50%);display:flex;align-items:center;gap:10px;border-radius:15px;padding:9px 11px 9px 10px;min-width:210px;cursor:pointer;text-align:left}
+.vendor-prompt:hover{background:linear-gradient(135deg,rgba(17,61,82,.92),rgba(8,32,48,.86));border-color:rgba(255,217,121,.3)}
+.vendor-icon{width:35px;height:35px;border-radius:11px;display:grid;place-items:center;background:linear-gradient(135deg,rgba(255,210,103,.2),rgba(54,151,198,.18));font-size:17px}
+.vendor-prompt>span:nth-child(2){display:flex;flex:1;flex-direction:column;min-width:0}.vendor-prompt b{font-size:10px}.vendor-prompt small{font-size:8px;color:var(--muted);margin-top:2px}
+.vendor-prompt kbd{border:1px solid rgba(255,255,255,.18);border-bottom-width:2px;border-radius:7px;background:rgba(255,255,255,.07);padding:4px 7px;font-size:9px;color:#ffe29a}
+.water-noise{opacity:.18;background-image:radial-gradient(circle at 20% 30%,rgba(255,255,255,.13) 0 1px,transparent 1px),radial-gradient(circle at 70% 50%,rgba(96,218,255,.1) 0 1px,transparent 1px),linear-gradient(115deg,transparent 0 48%,rgba(123,224,255,.035) 49% 50%,transparent 51%);background-size:23px 23px,31px 31px,180px 180px}
+@media(max-width:850px){
+  .minimap-panel{left:8px;top:76px;width:148px;padding:7px;border-radius:15px}
+  .minimap-title{margin-bottom:5px}.minimap-title small{display:none}
+  #minimap{height:96px;border-radius:10px}.minimap-legend{display:none}
+  .vendor-prompt{bottom:82px;min-width:190px;padding:8px 9px;gap:8px}.vendor-prompt kbd{display:none}.vendor-icon{width:31px;height:31px}
+}
+@media(max-width:430px){
+  .minimap-panel{width:132px}.vendor-prompt{left:50%;bottom:77px;min-width:172px}.vendor-prompt b{font-size:9px}.vendor-prompt small{font-size:7px}
+}
