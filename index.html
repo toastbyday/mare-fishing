@@ -13,7 +13,6 @@
   <div id="app" class="app hidden">
     <canvas id="world" aria-label="Mapa do jogo"></canvas>
     <div class="water-noise" aria-hidden="true"></div>
-
     <header class="hud-top glass">
       <div class="brand-mark"><span class="brand-wave">≈</span><div><b>MARE</b><small>FISHING</small></div></div>
       <div class="hud-stat"><span>NÍVEL</span><b id="levelText">1</b></div>
@@ -22,28 +21,15 @@
       <div class="hud-stat weather"><span id="weatherIcon">☀</span><div><b id="weatherText">Clear</b><small id="worldText">Summer · Day</small></div></div>
       <button id="menuBtn" class="icon-btn" aria-label="Abrir menu">☰</button>
     </header>
-
     <aside class="players glass" id="playersPanel">
       <div class="panel-mini-title"><span class="online-dot"></span> ONLINE <b id="onlineCount">1</b></div>
       <div id="onlineList" class="online-list"></div>
     </aside>
-
     <div id="eventBanner" class="event-banner hidden"></div>
     <div id="announcement" class="announcement hidden"></div>
     <div id="waypoint" class="waypoint">HARBOR HAVEN <span>0m</span></div>
-
-    <div class="mobile-joystick" id="joystick">
-      <div class="joystick-ring"><div id="joystickKnob" class="joystick-knob"></div></div>
-    </div>
-
-    <div class="action-cluster">
-      <button id="fishBtn" class="fish-btn">
-        <span class="hook">⌁</span>
-        <b>PESCAR</b>
-        <small id="fishHint">segure e solte</small>
-      </button>
-    </div>
-
+    <div class="mobile-joystick" id="joystick"><div class="joystick-ring"><div id="joystickKnob" class="joystick-knob"></div></div></div>
+    <div class="action-cluster"><button id="fishBtn" class="fish-btn"><span class="hook">⌁</span><b>PESCAR</b><small id="fishHint">segure e solte</small></button></div>
     <nav class="bottom-nav glass">
       <button data-panel="inventory"><span>▣</span><small>Inventário</small></button>
       <button data-panel="bestiary"><span>◈</span><small>Bestiário</small></button>
@@ -52,16 +38,12 @@
       <button data-panel="map"><span>⌖</span><small>Mapa</small></button>
     </nav>
   </div>
-
   <section id="authScreen" class="auth-screen">
     <div class="auth-ocean"></div>
     <div class="auth-card glass-strong">
       <div class="logo-big"><span>≈</span><h1>MARE <b>FISHING</b></h1></div>
       <p>Pesque, explore ilhas, complete o bestiário e encontre capturas absurdamente raras.</p>
-      <div class="auth-tabs">
-        <button class="active" data-auth-tab="login">Entrar</button>
-        <button data-auth-tab="signup">Criar conta</button>
-      </div>
+      <div class="auth-tabs"><button class="active" data-auth-tab="login">Entrar</button><button data-auth-tab="signup">Criar conta</button></div>
       <form id="loginForm" class="auth-form">
         <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required placeholder="voce@email.com" /></label>
         <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="••••••••" /></label>
@@ -77,55 +59,24 @@
       <small class="auth-note">Seu progresso fica salvo no Supabase. Não usamos a chave administrativa no navegador.</small>
     </div>
   </section>
-
   <div id="loading" class="loading hidden"><div class="loader-fish">◁</div><b>Carregando oceano...</b></div>
-
   <section id="sidePanel" class="side-panel glass-strong hidden" aria-modal="true">
-    <div class="panel-header">
-      <div><small>MARE FISHING</small><h2 id="panelTitle">Inventário</h2></div>
-      <button id="closePanel" class="icon-btn">✕</button>
-    </div>
-    <div id="panelTabs" class="panel-tabs"></div>
-    <div id="panelBody" class="panel-body"></div>
+    <div class="panel-header"><div><small>MARE FISHING</small><h2 id="panelTitle">Inventário</h2></div><button id="closePanel" class="icon-btn">✕</button></div>
+    <div id="panelTabs" class="panel-tabs"></div><div id="panelBody" class="panel-body"></div>
   </section>
-
   <section id="fishingOverlay" class="fishing-overlay hidden">
-    <div id="castStage" class="fishing-card glass-strong hidden">
-      <small>LANÇAMENTO</small><h2>Segure para carregar</h2>
-      <div class="cast-meter"><div id="castFill"></div><i></i></div>
-      <p>Solte o botão de pesca quando a barra estiver cheia.</p>
-    </div>
-    <div id="waitStage" class="wait-stage hidden">
-      <div class="bobber">●<span></span></div>
-      <div class="waiting-copy glass"><b id="waitingText">Esperando uma mordida...</b><small>Toque nos círculos para acelerar</small></div>
-      <div id="shakeLayer" class="shake-layer"></div>
-    </div>
-    <div id="reelStage" class="fishing-card reel-card glass-strong hidden">
-      <small>PUXE O PEIXE</small><h2>Mantenha o peixe na zona clara</h2>
-      <div id="reelBar" class="reel-bar"><div id="controlZone" class="control-zone"></div><div id="fishMarker" class="fish-marker">◀</div></div>
-      <div class="progress-track"><div id="reelProgress"></div></div>
-      <p>PC: A/D ou ←/→ · Mobile: arraste na barra</p>
-    </div>
+    <div id="castStage" class="fishing-card glass-strong hidden"><small>LANÇAMENTO</small><h2>Segure para carregar</h2><div class="cast-meter"><div id="castFill"></div><i></i></div><p>Solte o botão de pesca quando a barra estiver cheia.</p></div>
+    <div id="waitStage" class="wait-stage hidden"><div class="bobber">●<span></span></div><div class="waiting-copy glass"><b id="waitingText">Esperando uma mordida...</b><small>Toque nos círculos para acelerar</small></div><div id="shakeLayer" class="shake-layer"></div></div>
+    <div id="reelStage" class="fishing-card reel-card glass-strong hidden"><small>PUXE O PEIXE</small><h2>Mantenha o peixe na zona clara</h2><div id="reelBar" class="reel-bar"><div id="controlZone" class="control-zone"></div><div id="fishMarker" class="fish-marker">◀</div></div><div class="progress-track"><div id="reelProgress"></div></div><p>PC: A/D ou ←/→ · Mobile: arraste na barra</p></div>
   </section>
-
   <section id="catchModal" class="catch-modal hidden">
-    <div class="catch-glow"></div>
-    <div class="catch-card glass-strong">
-      <small id="catchRarity">RARE</small>
-      <div id="catchFishIcon" class="catch-fish-icon">◁</div>
-      <h2 id="catchName">Nightfin Tuna</h2>
-      <div id="catchTraits" class="catch-traits"></div>
-      <div class="catch-grid">
-        <div><span>PESO</span><b id="catchWeight">0 kg</b></div>
-        <div><span>VALOR</span><b id="catchValue">C$ 0</b></div>
-        <div><span>XP</span><b id="catchXp">+0</b></div>
-      </div>
-      <button id="catchClose" class="primary">Continuar</button>
-    </div>
+    <div class="catch-glow"></div><div class="catch-card glass-strong"><small id="catchRarity">RARE</small><div id="catchFishIcon" class="catch-fish-icon">◁</div><h2 id="catchName">Nightfin Tuna</h2><div id="catchTraits" class="catch-traits"></div><div class="catch-grid"><div><span>PESO</span><b id="catchWeight">0 kg</b></div><div><span>VALOR</span><b id="catchValue">C$ 0</b></div><div><span>XP</span><b id="catchXp">+0</b></div></div><button id="catchClose" class="primary">Continuar</button></div>
   </section>
-
   <div id="toastStack" class="toast-stack"></div>
-
-  <script type="module" src="./app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
+  <script src="./app-core.js"></script>
+  <script src="./app-world.js"></script>
+  <script src="./app-ui.js"></script>
+  <script src="./app-fishing.js"></script>
 </body>
 </html>
