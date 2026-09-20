@@ -7,7 +7,7 @@
   <meta name="description" content="Mare Fishing — aventura online de pesca, exploração e coleção." />
   <title>Mare Fishing</title>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
-  <link rel="stylesheet" href="./styles.css?v=20260920-world1" />
+  <link rel="stylesheet" href="./styles.css?v=20260920-userauth1" />
 </head>
 <body>
   <div id="app" class="app hidden">
@@ -55,18 +55,15 @@
       <p>Pesque, explore ilhas, complete o bestiário e encontre capturas absurdamente raras.</p>
       <div class="auth-tabs"><button class="active" data-auth-tab="login">Entrar</button><button data-auth-tab="signup">Criar conta</button></div>
       <form id="loginForm" class="auth-form">
-        <label>E-mail<input id="loginEmail" type="email" autocomplete="email" required placeholder="voce@email.com" /></label>
-        <label>Senha<input id="loginPassword" type="password" autocomplete="current-password" minlength="6" required placeholder="••••••••" /></label>
+        <label>Nome de usuário<input id="loginUsername" type="text" autocomplete="username" minlength="3" maxlength="24" required placeholder="Seu nome de usuário" /></label>
         <button class="primary" type="submit">Entrar no oceano</button>
       </form>
       <form id="signupForm" class="auth-form hidden">
-        <label>Nome no jogo<input id="signupName" maxlength="24" required placeholder="Pescador" /></label>
-        <label>E-mail<input id="signupEmail" type="email" autocomplete="email" required placeholder="voce@email.com" /></label>
-        <label>Senha<input id="signupPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="mínimo 6 caracteres" /></label>
+        <label>Nome de usuário<input id="signupName" type="text" autocomplete="username" minlength="3" maxlength="24" required placeholder="Escolha um nome" /></label>
         <button class="primary" type="submit">Criar conta</button>
       </form>
       <div id="authMessage" class="auth-message"></div>
-      <small class="auth-note">Seu progresso fica salvo no Supabase. Não usamos a chave administrativa no navegador.</small>
+      <small class="auth-note">Sem e-mail e sem senha. A conta fica vinculada a este navegador/dispositivo.</small>
     </div>
   </section>
   <div id="loading" class="loading hidden"><div class="loader-fish">◁</div><b>Carregando oceano...</b></div>
@@ -84,10 +81,10 @@
   </section>
   <div id="toastStack" class="toast-stack"></div>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.116.0/dist/umd/supabase.js"></script>
-  <script src="./app-core.js?v=20260920-world1"></script>
-  <script src="./app-world.js?v=20260920-world1"></script>
-  <script src="./app-ui.js?v=20260920-world1"></script>
-  <script src="./app-ui-extra.js?v=20260920-world1"></script>
-  <script src="./app-fishing.js?v=20260920-world1"></script>
+  <script src="./app-core.js?v=20260920-userauth1"></script>
+  <script src="./app-world.js?v=20260920-userauth1"></script>
+  <script src="./app-ui.js?v=20260920-userauth1"></script>
+  <script src="./app-ui-extra.js?v=20260920-userauth1"></script>
+  <script src="./app-fishing.js?v=20260920-userauth1"></script>
 </body>
 </html>
