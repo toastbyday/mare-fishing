@@ -132,8 +132,22 @@ function updateMovement(dt) {
 }
 function loop(now) { if(!G.running)return;const dt=Math.min(.04,(now-G.last)/1000||.016);G.last=now;updateMovement(dt);drawWorld(now);requestAnimationFrame(loop); }
 
-addEventListener("keydown",e=>{const k=e.key.toLowerCase();if(["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright"].includes(k)){G.keys.add(k);e.preventDefault();}});
-addEventListener("keyup",e=>G.keys.delete(e.key.toLowerCase()));
+function isTypingTarget(target) {
+  if (!(target instanceof Element)) return false;
+  return !!target.closest('input, textarea, select, [contenteditable="true"]');
+}
+addEventListener("keydown", e => {
+  if (isTypingTarget(e.target)) return;
+  const k = e.key.toLowerCase();
+  if (["w","a","s","d","arrowup","arrowdown","arrowleft","arrowright"].includes(k)) {
+    G.keys.add(k);
+    e.preventDefault();
+  }
+});
+addEventListener("keyup", e => {
+  if (isTypingTarget(e.target)) return;
+  G.keys.delete(e.key.toLowerCase());
+});
 
 function setupJoystick() {
   const root=$("#joystick"), knob=$("#joystickKnob");
